@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第一课 《开学典礼》配套词语闪卡</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    /* 汉字专用楷体字体栈 */
+    .font-kaiti, .hanzi-text, .kaiti-explain {
+      font-family: 'Kaiti', 'STKaiti', 'KaiTi_GB2312', 'BiauKai', 'Noto Serif SC', serif;
+    }
+
+    /* 拼音专用 Calibri 字体栈 */
+    .pinyin-calibri {
+      font-family: 'Calibri', 'Candara', 'Segoe', 'Segoe UI', 'Optima', Arial, sans-serif;
+    }
+
+    /* 3D 翻转卡片透视系统 */
+    .perspective-container {
+      perspective: 1200px;
+    }
+    
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .flip-card-inner.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 1.25rem;
+    }
+
+    .flip-card-back {
+      transform: rotateY(180deg);
+    }
+
+    /* 宣纸底纹与典雅书香质感 */
+    .parchment-pattern {
+      background-color: #fbf9f5;
+      background-image: radial-gradient(#eadbc8 0.75px, transparent 0.75px), radial-gradient(#eadbc8 0.75px, #fbf9f5 0.75px);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+    }
+
+    /* 卡片悬浮微妙微光效果 */
+    .card-shadow {
+      box-shadow: 0 10px 25px -5px rgba(120, 53, 15, 0.08), 0 8px 10px -6px rgba(120, 53, 15, 0.05);
+    }
+    .card-shadow:hover {
+      box-shadow: 0 20px 35px -10px rgba(120, 53, 15, 0.16), 0 10px 15px -5px rgba(120, 53, 15, 0.08);
+    }
+
+    /* 隐藏滚动条 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="parchment-pattern min-h-screen text-slate-800 flex flex-col font-sans antialiased selection:bg-amber-100 selection:text-amber-900">
+
+  <header class="bg-white/90 backdrop-blur border-b border-amber-200/80 sticky top-0 z-30 shadow-sm transition-all">
+    <div class="max-w-6xl mx-auto px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3">
+      <!-- 标题区域 -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-600/10 text-amber-700 flex items-center justify-center font-bold text-xl border border-amber-300">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2 py-0.5 rounded">中文第八册</span>
+            <h1 class="text-lg sm:text-xl font-bold text-slate-900 font-kaiti">第一课《开学典礼》生词互动闪卡</h1>
+          </div>
+          <p class="text-xs text-slate-500">正面纯汉字（楷体） · 点击翻面看拼音（Calibri）及释义</p>
+        </div>
+      </div>
+
+      <!-- 掌握进度统计 -->
+      <div class="flex items-center gap-4 bg-amber-50/70 border border-amber-200/60 rounded-xl px-3 py-1.5 text-xs sm:text-sm">
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <i class="fa-solid fa-layer-group text-amber-600"></i>
+          <span>总词数：<strong id="total-count-badge" class="text-slate-900 font-semibold">20</strong></span>
+        </div>
+        <div class="h-4 w-px bg-amber-200"></div>
+        <div class="flex items-center gap-1.5 text-emerald-700 font-medium">
+          <i class="fa-solid fa-circle-check text-emerald-500"></i>
+          <span>已掌握：<strong id="mastered-count-badge">0</strong></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:px-6 flex flex-col gap-6">
+    <!-- 控制栏 -->
+    <div class="flex flex-wrap items-center justify-between gap-3 bg-white/80 p-3 sm:p-4 rounded-2xl border border-amber-100 shadow-sm">
+      <!-- 视图切换 -->
+      <div class="flex bg-slate-100 p-1 rounded-xl text-xs sm:text-sm font-medium">
+        <button id="btn-mode-grid" onclick="switchViewMode('grid')" class="px-3.5 py-1.5 rounded-lg transition-all bg-white text-slate-900 shadow-sm flex items-center gap-1.5">
+          <i class="fa-solid fa-table-cells-large"></i> 网格浏览
+        </button>
+        <button id="btn-mode-single" onclick="switchViewMode('single')" class="px-3.5 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+          <i class="fa-regular fa-square"></i> 单卡专注
+        </button>
+      </div>
+
+      <!-- 状态筛选 -->
+      <div class="flex items-center gap-2 text-xs sm:text-sm">
+        <span class="text-slate-500 hidden sm:inline">筛选：</span>
+        <button onclick="setFilter('all')" id="filter-all" class="px-3 py-1 rounded-lg bg-amber-700 text-white font-medium transition-colors">全部</button>
+        <button onclick="setFilter('unmastered')" id="filter-unmastered" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">需复习</button>
+        <button onclick="setFilter('mastered')" id="filter-mastered" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">已熟记</button>
+      </div>
+
+      <!-- 快捷工具按钮组 -->
+      <div class="flex items-center gap-2">
+        <button onclick="flipAllCards()" title="全部翻转" class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-amber-50 text-slate-700 text-xs sm:text-sm flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-arrows-rotate text-amber-600"></i>
+          <span>一键全翻</span>
+        </button>
+        <button onclick="shuffleCards()" title="打乱卡片顺序" class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-amber-50 text-slate-700 text-xs sm:text-sm flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-shuffle text-amber-600"></i>
+          <span>随机乱序</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 单卡专注轮播视图 (默认隐藏) -->
+    <div id="single-view-container" class="hidden flex flex-col items-center justify-center py-4 my-auto">
+      <div class="w-full max-w-xl perspective-container h-80 sm:h-96 relative cursor-pointer" onclick="toggleCurrentSingleFlip()">
+        <div id="single-card-inner" class="flip-card-inner card-shadow">
+          <!-- 单卡正面：纯楷体汉字 -->
+          <div class="flip-card-front bg-gradient-to-b from-white to-[#fffdf9] border-2 border-amber-200/90 flex flex-col justify-between p-8 text-center select-none">
+            <div class="flex justify-between items-center text-xs text-amber-800/60">
+              <span class="tracking-widest">第 <span id="single-index-display">1</span> / <span id="single-total-display">20</span> 词</span>
+              <span class="bg-amber-100/80 px-2 py-0.5 rounded text-amber-800"><i class="fa-solid fa-hand-pointer mr-1"></i>点击翻面</span>
+            </div>
+            
+            <div class="my-auto flex flex-col items-center">
+              <h2 id="single-front-text" class="font-kaiti text-6xl sm:text-7xl font-bold tracking-wider text-slate-900 py-4 drop-shadow-sm">
+                开学典礼
+              </h2>
+            </div>
+
+            <div class="text-xs text-slate-400 font-sans flex items-center justify-center gap-1">
+              <span>正面仅展示汉字</span>
+            </div>
+          </div>
+
+          <!-- 单卡背面：Calibri拼音 + 楷体释义 -->
+          <div class="flip-card-back bg-gradient-to-b from-amber-50/50 to-white border-2 border-amber-300 flex flex-col justify-between p-8 text-center select-none">
+            <div class="flex justify-between items-center">
+              <span id="single-mastered-indicator" class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-500">未标记掌握</span>
+              <button onclick="event.stopPropagation(); playCurrentPronunciation()" class="p-2 text-amber-700 hover:text-amber-800 hover:bg-amber-100/60 rounded-full transition" title="朗读发音">
+                <i class="fa-solid fa-volume-high text-lg"></i>
+              </button>
+            </div>
+
+            <div class="my-auto flex flex-col items-center gap-4">
+              <!-- 汉字微览 -->
+              <h3 id="single-back-hanzi" class="font-kaiti text-4xl sm:text-5xl font-bold text-slate-800">
+                开学典礼
+              </h3>
+              <!-- 拼音：纯正 Calibri 字体 -->
+              <div id="single-back-pinyin" class="pinyin-calibri text-2xl sm:text-3xl text-amber-700 font-semibold tracking-wide">
+                kāi xué diǎn lǐ
+              </div>
+              <div class="w-16 h-0.5 bg-amber-200 rounded-full mx-auto my-1"></div>
+              <!-- 一句话释义：楷体 -->
+              <p id="single-back-meaning" class="kaiti-explain text-lg sm:text-xl text-slate-700 leading-relaxed max-w-md mx-auto">
+                新学期开始时全校师生共同参加的隆重集会仪式。
+              </p>
+            </div>
+
+            <div class="text-xs text-amber-700/60 flex items-center justify-center gap-2">
+              <span>再次点击翻回正面</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 单卡切换控制器 -->
+      <div class="flex items-center gap-4 mt-6">
+        <button onclick="prevSingleCard()" class="w-12 h-12 rounded-full bg-white border border-slate-200 shadow hover:bg-amber-50 text-slate-700 flex items-center justify-center transition active:scale-95">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <button id="single-toggle-master-btn" onclick="toggleCurrentMastery()" class="px-5 py-2.5 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-medium text-sm transition flex items-center gap-2 shadow-sm">
+          <i class="fa-regular fa-circle-check"></i> 标为已掌握
+        </button>
+        <button onclick="nextSingleCard()" class="w-12 h-12 rounded-full bg-white border border-slate-200 shadow hover:bg-amber-50 text-slate-700 flex items-center justify-center transition active:scale-95">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-400 mt-3">提示：键盘使用 [空格键] 翻转卡片，[←] 与 [→] 左右切换</p>
+    </div>
+
+    <!-- 全词语网格视图 (默认展示) -->
+    <div id="grid-view-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <!-- 动态卡片内容将由 JavaScript 生成插入 -->
+    </div>
+
+    <!-- 筛选为空时的提示信息 -->
+    <div id="empty-state-notice" class="hidden py-16 text-center">
+      <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-2xl">
+        <i class="fa-regular fa-folder-open"></i>
+      </div>
+      <p class="text-base text-slate-600 font-medium">当前分类下没有词语卡片</p>
+      <button onclick="setFilter('all')" class="mt-3 text-sm text-amber-700 underline underline-offset-4">查看全部卡片</button>
+    </div>
+  </main>
+
+  <!-- 底部说明与快捷帮助 -->
+  <footer class="mt-auto border-t border-amber-200/60 bg-white/70 py-4 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>规范：正面楷体（KaiTi）· 拼音 Calibri · 一句话释义精准对照</p>
+      <p>暨南大学《中文》教材 第八册 第一课 配套字词库</p>
+    </div>
+  </footer>
+
+  <script>
+    // 词汇数据库：涵盖指定保留词与教材图片配套生词
+    const vocabularyList = [
+      {
+        id: 1,
+        hanzi: "开学典礼",
+        pinyin: "kāi xué diǎn lǐ",
+        meaning: "新学期开始时全校师生共同参加的隆重集会仪式。",
+        mastered: false
+      },
+      {
+        id: 2,
+        hanzi: "会议厅",
+        pinyin: "huì yì tīng",
+        meaning: "举行大型会议、集会或典礼的宽敞礼堂。",
+        mastered: false
+      },
+      {
+        id: 3,
+        hanzi: "主席台",
+        pinyin: "zhǔ xí tái",
+        meaning: "集会或典礼上方设置的供主持人与发言代表就座的高台。",
+        mastered: false
+      },
+      {
+        id: 4,
+        hanzi: "掌声",
+        pinyin: "zhǎng shēng",
+        meaning: "双手拍击所发出的清脆声音，多用于表示欢迎或喝彩。",
+        mastered: false
+      },
+      {
+        id: 5,
+        hanzi: "经贸",
+        pinyin: "jīng mào",
+        meaning: "经济与贸易的合称，指商业往来与国际经济交流活动。",
+        mastered: false
+      },
+      {
+        id: 6,
+        hanzi: "日益",
+        pinyin: "rì yì",
+        meaning: "表示随着时间一天天过去，程度逐渐加深。",
+        mastered: false
+      },
+      {
+        id: 7,
+        hanzi: "普通话",
+        pinyin: "pǔ tōng huà",
+        meaning: "以北京语音为标准音的现代标准通用汉语言。",
+        mastered: false
+      },
+      {
+        id: 8,
+        hanzi: "赢得",
+        pinyin: "yíng dé",
+        meaning: "通过优秀的表现、诚意或竞争获得认可与赞赏。",
+        mastered: false
+      },
+      {
+        id: 9,
+        hanzi: "越来越",
+        pinyin: "yuè lái yuè",
+        meaning: "表示性质或程度随着时间推移不断加深。",
+        mastered: false
+      },
+      {
+        id: 10,
+        hanzi: "会场",
+        pinyin: "huì chǎng",
+        meaning: "举行集会、庆典或会议的专门场地。",
+        mastered: false
+      },
+      {
+        id: 11,
+        hanzi: "热烈",
+        pinyin: "rè liè",
+        meaning: "形容兴奋激动、现场气氛十分高涨活跃。",
+        mastered: false
+      },
+      {
+        id: 12,
+        hanzi: "互相",
+        pinyin: "hù xiāng",
+        meaning: "表示彼此双方以同样的方式对待对方。",
+        mastered: false
+      },
+      {
+        id: 13,
+        hanzi: "握手",
+        pinyin: "wò shǒu",
+        meaning: "双方用手相握，表达礼貌、友好与问候的社交礼节。",
+        mastered: false
+      },
+      {
+        id: 14,
+        hanzi: "问好",
+        pinyin: "wèn hǎo",
+        meaning: "向人问候致意，表达关心或客气礼貌。",
+        mastered: false
+      },
+      {
+        id: 15,
+        hanzi: "宣布",
+        pinyin: "xuān bù",
+        meaning: "正式、公开地把事情或者决定告知大家。",
+        mastered: false
+      },
+      {
+        id: 16,
+        hanzi: "首先",
+        pinyin: "shǒu xiān",
+        meaning: "最先，指按照顺序排列在第一位的行动或事物。",
+        mastered: false
+      },
+      {
+        id: 17,
+        hanzi: "介绍",
+        pinyin: "jiè shào",
+        meaning: "使双方互相认识了解，或向别人解说事物。",
+        mastered: false
+      },
+      {
+        id: 18,
+        hanzi: "咱们",
+        pinyin: "zán men",
+        meaning: "代词，指我和你（们），通常指说话人和听话人双方。",
+        mastered: false
+      },
+      {
+        id: 19,
+        hanzi: "说明",
+        pinyin: "shuō míng",
+        meaning: "证明 / 解释明白，或者用言语文字阐述理由与情况。",
+        mastered: false
+      },
+      {
+        id: 20,
+        hanzi: "教育",
+        pinyin: "jiào yù",
+        meaning: "按照特定目的培养人的品德与传授知识技能的活动。",
+        mastered: false
+      },
+      {
+        id: 21,
+        hanzi: "社会",
+        pinyin: "shè huì",
+        meaning: "由具有共同生活和文化联系的人群组成的有机整体。",
+        mastered: false
+      },
+      {
+        id: 22,
+        hanzi: "敬礼",
+        pinyin: "jìng lǐ",
+        meaning: "表示尊敬的礼节动作（如队礼或鞠躬致敬）。",
+        mastered: false
+      },
+      {
+        id: 23,
+        hanzi: "讲话",
+        pinyin: "jiǎng huà",
+        meaning: "在公众场合发表谈话或致辞发言。",
+        mastered: false
+      },
+      {
+        id: 24,
+        hanzi: "代表",
+        pinyin: "dài biǎo",
+        meaning: "受委托代替集体、团队表达心声与行事的人。",
+        mastered: false
+      },
+      {
+        id: 25,
+        hanzi: "先后",
+        pinyin: "xiān hòu",
+        meaning: "依照先后次序接连发生，一个接一个。",
+        mastered: false
+      },
+      {
+        id: 26,
+        hanzi: "发言",
+        pinyin: "fā yán",
+        meaning: "在会议或公众集会上发表正式讲话或意见。",
+        mastered: false
+      },
+      {
+        id: 27,
+        hanzi: "标准",
+        pinyin: "biāo zhǔn",
+        meaning: "衡量事物的准则或榜样，符合规范要求。",
+        mastered: false
+      }
+    ];
+
+    // 应用当前状态
+    let currentCards = [...vocabularyList];
+    let currentFilter = 'all'; // 'all' | 'unmastered' | 'mastered'
+    let currentViewMode = 'grid'; // 'grid' | 'single'
+    let singleCardIndex = 0;
+    let singleCardFlipped = false;
+
+    // 渲染网格视图
+    function renderGridCards() {
+      const container = document.getElementById('grid-view-container');
+      const emptyNotice = document.getElementById('empty-state-notice');
+      container.innerHTML = '';
+
+      const filtered = getFilteredCards();
+
+      if (filtered.length === 0) {
+        emptyNotice.classList.remove('hidden');
+        return;
+      } else {
+        emptyNotice.classList.add('hidden');
+      }
+
+      filtered.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'perspective-container h-64 w-full cursor-pointer select-none';
+        cardElement.setAttribute('data-id', card.id);
+        
+        cardElement.innerHTML = `
+          <div class="flip-card-inner card-shadow rounded-2xl relative" id="grid-card-${card.id}" onclick="flipGridCard(${card.id})">
+            <!-- 正面：纯汉字（楷体） -->
+            <div class="flip-card-front bg-gradient-to-b from-white to-[#fdfbf7] border-2 border-amber-200/80 p-5 flex flex-col justify-between items-center text-center">
+              <div class="w-full flex justify-between items-center text-[11px] text-amber-800/60">
+                <span class="font-medium tracking-wide">词语 ${index + 1}</span>
+                <span class="bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50"><i class="fa-solid fa-repeat text-[10px] mr-1"></i>翻转</span>
+              </div>
+              
+              <!-- 核心汉字：仅展示汉字，字号大，字体严格楷体 -->
+              <div class="my-auto">
+                <div class="hanzi-text font-kaiti font-bold text-4xl sm:text-5xl text-slate-800 tracking-wider hover:scale-105 transition-transform duration-200">
+                  ${card.hanzi}
+                </div>
+              </div>
+
+              <div class="w-full flex justify-between items-center text-[11px] text-slate-400">
+                <span class="font-kaiti">楷体展示</span>
+                ${card.mastered ? '<span class="text-emerald-600 font-semibold flex items-center gap-1"><i class="fa-solid fa-check"></i>已掌握</span>' : '<span class="text-slate-400">未标记</span>'}
+              </div>
+            </div>
+
+            <!-- 背面：Calibri 拼音与一句话释义 -->
+            <div class="flip-card-back bg-gradient-to-b from-[#fefdfb] to-amber-50/60 border-2 border-amber-300 p-5 flex flex-col justify-between text-left">
+              <div class="flex items-center justify-between">
+                <span class="font-kaiti text-xs font-bold text-amber-900 bg-amber-100/70 px-2 py-0.5 rounded">${card.hanzi}</span>
+                <div class="flex items-center gap-1">
+                  <button onclick="event.stopPropagation(); speakWord('${card.hanzi}')" title="发音" class="w-7 h-7 rounded-full bg-white hover:bg-amber-100 text-amber-700 flex items-center justify-center border border-amber-200 transition">
+                    <i class="fa-solid fa-volume-high text-xs"></i>
+                  </button>
+                  <button onclick="event.stopPropagation(); toggleMastery(${card.id})" title="${card.mastered ? '取消掌握' : '标记为已掌握'}" class="w-7 h-7 rounded-full ${card.mastered ? 'bg-emerald-600 text-white' : 'bg-white text-slate-400 hover:text-emerald-600'} flex items-center justify-center border border-slate-200 transition">
+                    <i class="fa-solid fa-check text-xs"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 拼音与释义区 -->
+              <div class="my-auto py-2">
+                <!-- 拼音强制使用 Calibri -->
+                <div class="pinyin-calibri text-2xl font-bold text-amber-700 tracking-wide mb-2.5">
+                  ${card.pinyin}
+                </div>
+                <!-- 释义楷体 -->
+                <p class="kaiti-explain font-kaiti text-sm sm:text-base text-slate-700 leading-relaxed">
+                  ${card.meaning}
+                </p>
+              </div>
+
+              <div class="text-[10px] text-slate-400 flex justify-between items-center border-t border-amber-100 pt-1.5 font-sans">
+                <span>拼音: Calibri</span>
+                <span class="text-amber-800/60">点击翻回正面</span>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(cardElement);
+      });
+
+      updateStats();
+    }
+
+    // 翻转单张网格卡片
+    function flipGridCard(id) {
+      const cardElement = document.getElementById(`grid-card-${id}`);
+      if (cardElement) {
+        cardElement.classList.toggle('flipped');
+      }
+    }
+
+    // 全部卡片同时翻转
+    let allFlippedState = false;
+    function flipAllCards() {
+      allFlippedState = !allFlippedState;
+      const filtered = getFilteredCards();
+      filtered.forEach(card => {
+        const cardElement = document.getElementById(`grid-card-${card.id}`);
+        if (cardElement) {
+          if (allFlippedState) {
+            cardElement.classList.add('flipped');
+          } else {
+            cardElement.classList.remove('flipped');
+          }
+        }
+      });
+    }
+
+    // 随机打乱卡片顺序
+    function shuffleCards() {
+      for (let i = currentCards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [currentCards[i], currentCards[j]] = [currentCards[j], currentCards[i]];
+      }
+      singleCardIndex = 0;
+      renderGridCards();
+      updateSingleCardView();
+    }
+
+    // 标记或取消掌握状态
+    function toggleMastery(id) {
+      const item = currentCards.find(c => c.id === id);
+      if (item) {
+        item.mastered = !item.mastered;
+        renderGridCards();
+        if (currentViewMode === 'single') {
+          updateSingleCardView();
+        }
+      }
+    }
+
+    // 切换学习模式 (网格 / 单卡)
+    function switchViewMode(mode) {
+      currentViewMode = mode;
+      const gridContainer = document.getElementById('grid-view-container');
+      const singleContainer = document.getElementById('single-view-container');
+      const emptyNotice = document.getElementById('empty-state-notice');
+      const btnGrid = document.getElementById('btn-mode-grid');
+      const btnSingle = document.getElementById('btn-mode-single');
+
+      if (mode === 'grid') {
+        gridContainer.classList.remove('hidden');
+        singleContainer.classList.add('hidden');
+        btnGrid.className = 'px-3.5 py-1.5 rounded-lg transition-all bg-white text-slate-900 shadow-sm flex items-center gap-1.5';
+        btnSingle.className = 'px-3.5 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5';
+        renderGridCards();
+      } else {
+        gridContainer.classList.add('hidden');
+        emptyNotice.classList.add('hidden');
+        singleContainer.classList.remove('hidden');
+        btnSingle.className = 'px-3.5 py-1.5 rounded-lg transition-all bg-white text-slate-900 shadow-sm flex items-center gap-1.5';
+        btnGrid.className = 'px-3.5 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5';
+        singleCardIndex = 0;
+        singleCardFlipped = false;
+        updateSingleCardView();
+      }
+    }
+
+    // 更新单卡专注视图内容
+    function updateSingleCardView() {
+      const filtered = getFilteredCards();
+      const inner = document.getElementById('single-card-inner');
+      if (filtered.length === 0) {
+        document.getElementById('single-front-text').textContent = '暂无词语';
+        return;
+      }
+
+      if (singleCardIndex >= filtered.length) {
+        singleCardIndex = 0;
+      } else if (singleCardIndex < 0) {
+        singleCardIndex = filtered.length - 1;
+      }
+
+      const card = filtered[singleCardIndex];
+      
+      // 更新正面 (楷体纯汉字)
+      document.getElementById('single-front-text').textContent = card.hanzi;
+      document.getElementById('single-index-display').textContent = singleCardIndex + 1;
+      document.getElementById('single-total-display').textContent = filtered.length;
+
+      // 更新背面 (Calibri 拼音与楷体释义)
+      document.getElementById('single-back-hanzi').textContent = card.hanzi;
+      document.getElementById('single-back-pinyin').textContent = card.pinyin;
+      document.getElementById('single-back-meaning').textContent = card.meaning;
+
+      // 掌握状态按钮文本与样式
+      const masterBtn = document.getElementById('single-toggle-master-btn');
+      const indicator = document.getElementById('single-mastered-indicator');
+      if (card.mastered) {
+        masterBtn.innerHTML = '<i class="fa-solid fa-check"></i> 取消掌握';
+        masterBtn.className = 'px-5 py-2.5 rounded-xl border border-emerald-400 bg-emerald-600 text-white font-medium text-sm transition flex items-center gap-2 shadow-sm';
+        indicator.textContent = '已掌握熟记';
+        indicator.className = 'text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold';
+      } else {
+        masterBtn.innerHTML = '<i class="fa-regular fa-circle-check"></i> 标为已掌握';
+        masterBtn.className = 'px-5 py-2.5 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-medium text-sm transition flex items-center gap-2 shadow-sm';
+        indicator.textContent = '学习中';
+        indicator.className = 'text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-500';
+      }
+
+      if (singleCardFlipped) {
+        inner.classList.add('flipped');
+      } else {
+        inner.classList.remove('flipped');
+      }
+
+      updateStats();
+    }
+
+    function toggleCurrentSingleFlip() {
+      singleCardFlipped = !singleCardFlipped;
+      const inner = document.getElementById('single-card-inner');
+      if (singleCardFlipped) {
+        inner.classList.add('flipped');
+      } else {
+        inner.classList.remove('flipped');
+      }
+    }
+
+    function nextSingleCard() {
+      const filtered = getFilteredCards();
+      if (filtered.length <= 1) return;
+      singleCardFlipped = false;
+      singleCardIndex = (singleCardIndex + 1) % filtered.length;
+      updateSingleCardView();
+    }
+
+    function prevSingleCard() {
+      const filtered = getFilteredCards();
+      if (filtered.length <= 1) return;
+      singleCardFlipped = false;
+      singleCardIndex = (singleCardIndex - 1 + filtered.length) % filtered.length;
+      updateSingleCardView();
+    }
+
+    function toggleCurrentMastery() {
+      const filtered = getFilteredCards();
+      if (filtered.length > 0) {
+        const card = filtered[singleCardIndex];
+        toggleMastery(card.id);
+      }
+    }
+
+    function playCurrentPronunciation() {
+      const filtered = getFilteredCards();
+      if (filtered.length > 0) {
+        speakWord(filtered[singleCardIndex].hanzi);
+      }
+    }
+
+    // 过滤卡片
+    function getFilteredCards() {
+      if (currentFilter === 'mastered') {
+        return currentCards.filter(c => c.mastered);
+      } else if (currentFilter === 'unmastered') {
+        return currentCards.filter(c => !c.mastered);
+      }
+      return currentCards;
+    }
+
+    function setFilter(type) {
+      currentFilter = type;
+      ['all', 'unmastered', 'mastered'].forEach(f => {
+        const btn = document.getElementById(`filter-${f}`);
+        if (f === type) {
+          btn.className = 'px-3 py-1 rounded-lg bg-amber-700 text-white font-medium transition-colors';
+        } else {
+          btn.className = 'px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors';
+        }
+      });
+
+      singleCardIndex = 0;
+      singleCardFlipped = false;
+
+      if (currentViewMode === 'grid') {
+        renderGridCards();
+      } else {
+        updateSingleCardView();
+      }
+    }
+
+    // 更新掌握统计栏
+    function updateStats() {
+      const masteredCount = currentCards.filter(c => c.mastered).length;
+      document.getElementById('total-count-badge').textContent = currentCards.length;
+      document.getElementById('mastered-count-badge').textContent = masteredCount;
+    }
+
+    // 语音朗读功能 (利用现代浏览器原生的 SpeechSynthesis)
+    function speakWord(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // 停止先前的朗读
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'zh-CN';
+        utter.rate = 0.85; // 语速适中微慢，利于听清声调
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    // 键盘快捷键监听
+    window.addEventListener('keydown', (e) => {
+      if (currentViewMode === 'single') {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          toggleCurrentSingleFlip();
+        } else if (e.code === 'ArrowRight') {
+          e.preventDefault();
+          nextSingleCard();
+        } else if (e.code === 'ArrowLeft') {
+          e.preventDefault();
+          prevSingleCard();
+        }
+      }
+    });
+
+    // 页面加载启动
+    window.addEventListener('DOMContentLoaded', () => {
+      renderGridCards();
+    });
+  </script>
+</body>
+</html>
